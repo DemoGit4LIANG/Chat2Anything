@@ -5,13 +5,13 @@
 
 Chat2Anything是面向企业内部环境的大模型(LLM)知识库问答系统，它具备以下功能：
 
-- 包含客户端(Chat2Anything Admin)与后台管理系统(Chat2Anything Admin)，其中后台管理系统负责大模型知识库的创建与管理，__用户可通过上传Excle、Word、PDF等文件向大模型添加企业内部知识__(Langchain机制)；管理系统包含完整的用户权限、角色、组织、数据字典管理等功能
+- 包含客户端(Chat2Anything Admin)与后台管理系统(Chat2Anything Admin)，其中后台管理系统负责大模型知识库的创建与管理，__用户可通过上传Excel、Word、PDF等文件向大模型添加企业内部知识__(Langchain机制)；管理系统包含完整的用户权限、角色、组织、数据字典管理等功能
   
 
 - 支持ChatGPT、ChatGLM、Vicuna等主流大模型，用户可随时切换大模型；__当使用ChatGLM、Vicuna时，整套系统可实现完全私域部署，企业数据100%内部流转__
 
 
-- 数据库接入，收到/自动选择查询分析涉及的表，Text2SQL(待完善)，查询结果可视化(待开发)
+- 支持业务系统数据库接入，手动/自动选择查询分析涉及的表，__根据用户问题描述Text2SQL(待完善)，查询结果自动执行并可视化(待开发)__
 
 
   <img src="Chat2Anything/assets/client_demo.gif" width="100%"/>
