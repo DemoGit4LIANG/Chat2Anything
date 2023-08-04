@@ -14,9 +14,9 @@ Chat2Anything是面向企业内部环境的大模型(LLM)知识库问答系统�
 - 数据库接入，收到/自动选择查询分析涉及的表，Text2SQL(待完善)，查询结果可视化(待开发)
 
 
-  <img src="Chat2Anything/assets/client_demo.gif" width="70%"/>
+  <img src="Chat2Anything/assets/client_demo.gif" width="100%"/>
   </br>
-  <img src="Chat2Anything/assets/admin_demo.gif" width="70%"/>
+  <img src="Chat2Anything/assets/admin_demo.gif" width="100%"/>
 
 ## 部署
 ### Chat2Anything (客户端)
