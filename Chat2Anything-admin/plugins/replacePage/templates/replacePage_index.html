@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>pear-admin-flask</title>
+    <meta name="description" content="pear-admin-flask">
+    {% include 'system/common/header.html' %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='index/layui/css/layui.css') }}"/>
+    <link rel="stylesheet" href="{{ url_for('static', filename='index/css/main.css') }}"/>
+    <link rel="stylesheet" href="{{ url_for('static', filename='index/css/load.css') }}"/>
+    <style>
+        .layui-nav .layui-this:after {
+            display: none;
+        }
+
+        .layui-nav .layui-nav-bar {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+<!-- header -->
+<div class="ew-header">
+    <img class="layui-logo" src="{{ url_for('static', filename='index/images/un28.svg') }}"
+         style="height:50px;padding: 10px;"/>
+    <div class="ew-nav-group">
+        <div class="nav-toggle"><i class="layui-icon layui-icon-more-vertical"></i></div>
+        <ul class="layui-nav" lay-filter="ew-header-nav">
+            <li class="layui-nav-item">
+                <a lay-href="/">首页</a>
+            </li>
+            <li class="layui-nav-item">
+                <a href="/system" target="_blank">后台</a>
+            </li>
+        </ul>
+    </div>
+</div>
+<!-- banner -->
+<div class="ew-banner" style="box-shadow: 0 0 8px rgba(0,0,0,.101562);">
+    <div class="layui-container">
+        <div class="layui-row layui-col-space25" style="margin-top: 10px;">
+           <h1>主页被我替换了哈哈哈！</h1>
+        </div>
+    </div>
+    <br/>
+    <br/>
+</div>
+
+
+
+
+</div>
+
+<!-- js部分 -->
+<script src="{{ url_for('static', filename='system/component/layui/layui.js') }}"></script>
+<script src="{{ url_for('static', filename='system/component/pear/pear.js') }}"></script>
+
+<script>
+  layui.use(['layer', 'form', 'jquery'], function () {
+    var $ = layui.jquery
+    var layer = layui.layer
+    var form = layui.form
+    var jquery = layui.jquery
+  })
+</script>
+</body>
+</html>

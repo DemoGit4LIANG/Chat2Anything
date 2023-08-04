@@ -1,0 +1,15 @@
+FROM pearadminflask/python3.7-flask:pillow
+
+COPY . /app/
+COPY dockerdata/config.py /app/applications/
+COPY dockerdata/start.sh /app
+
+WORKDIR /app/
+
+ENV TIME_ZONE Asia/Shanghai
+
+RUN echo "${TIME_ZONE}" > /etc/timezone \
+    && ln -sf /usr/share/zoneinfo/${TIME_ZONE} /etc/localtime \
+    && chmod +x /app/start.sh
+
+CMD ./start.sh

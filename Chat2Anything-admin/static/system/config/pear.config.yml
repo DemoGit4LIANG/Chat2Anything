@@ -1,0 +1,6 @@
+theme:
+  defaultColor: "0"
+  defaultMenu: "dark-theme"
+  defaultHeader: "light-theme"
+  allowCustom: true
+  banner: true

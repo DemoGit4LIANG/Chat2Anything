@@ -1,0 +1,30 @@
+version: '3'
+services:
+  redis:
+    image: redis
+    container_name: redis
+    ports:
+      - "63799:6379"
+  mysql:
+    image: mysql
+    container_name: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: 123456
+      LANG: C.UTF-8
+      TZ: Asia/Shanghai  
+      MYSQL_CHARSET: utf8mb4
+      MYSQL_COLLATION: utf8mb4_unicode_ci
+    ports:
+      - "3306:3306"
+  flask:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: flask
+    ports:
+      - "8000:8000"
+    depends_on:
+      - redis
+      - mysql
+    restart: always
+    command: sh -c  "./start.sh" 

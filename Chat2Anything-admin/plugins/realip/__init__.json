@@ -1,0 +1,5 @@
+{
+  "plugin_name": "真实IP插件",
+  "plugin_version": "1.0.0.1",
+  "plugin_description": "在上游更改访客IP地址，并采用自定义日志输出。"
+}

@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+<head>
+    {% include 'system/common/header.html' %}
+    <style>
+        .pear-container {
+            background-color: white;
+        }
+
+        body {
+            margin: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<script src="{{ url_for('static', filename='system/component/layui/layui.js') }}"></script>
+<form class="layui-form">
+    <div class="layui-form-item">
+        <label class="layui-form-label">知识库名称</label>
+        <div class="layui-input-block">
+            <input type="text" name="input_name" required lay-verify="required" placeholder="请输入" class="layui-input" />
+        </div>
+        <br/>
+        <label class="layui-form-label">知识库描述</label>
+        <div class="layui-input-block">
+            <textarea name="input_desc" required lay-verify="required" placeholder="简练描述知识库内容" class="layui-textarea"></textarea>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button type="button" class="pear-btn pear-btn-primary pear-btn" id="select_file">
+                <i class="layui-icon"></i>选择文件
+            </button>
+
+            <div class="layui-inline layui-word-aux">
+              可同时选择多个文件, 支持xlsx、csv、docx、pdf、txt、md格式文件
+            </div>
+
+            <br><br>
+            <div class="layui-upload-list">
+            <table class="layui-table">
+              <colgroup>
+                <col width="250">
+                <col width="150">
+                <col width="200">
+                <col width="150">
+              </colgroup>
+              <thead>
+                <th>文件名</th>
+                <th>大小</th>
+                <th>上传进度</th>
+                <th>操作</th>
+              </thead>
+              <tbody id="file_list"></tbody>
+            </table>
+          </div>
+
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button class="pear-btn pear-btn-primary pear-btn" lay-submit="" id="upload" onclick="return false">开始上传</button>
+        </div>
+    </div>
+</form>
+
+
+<script>
+    layui.use(['form', 'layer', 'upload'], function () {
+        var upload = layui.upload;
+        var element = layui.element;
+        var $ = layui.$;
+        // 制作多文件上传表格
+        var uploadListIns = upload.render({
+            elem: '#select_file',
+            elemList: $('#file_list'), // 列表元素对象
+            url: "{{ url_for('knowledge.knowledge_store.upload_api') }}",
+            accept: 'file',
+            exts: 'xlsx|csv|docx|pdf|txt|md',
+            multiple: true,
+            unified: true,
+            number: 100,
+            auto: false,//选择文件后不自动上传
+            bindAction: '#upload',
+            //上传前的回调
+            before: function () {
+                this.data = {
+                    input_name: $('input[name="input_name"]').val(),
+                    input_desc: $('textarea[name="input_desc"]').val()
+                }
+            },
+            //选择文件后的回调
+            choose: function(obj){
+              var that = this;
+              var files = this.files = obj.pushFile(); // 将每次选择的文件追加到文件队列
+              // 读取本地文件
+              obj.preview(function(index, file, result){
+                var tr = $(['<tr id="upload-'+ index +'">',
+                  '<td>'+ file.name +'</td>',
+                  '<td>'+ (file.size/1024).toFixed(1) +'kb</td>',
+                  '<td><div class="layui-progress" lay-filter="progress-demo"><div class="layui-progress-bar" lay-percent=""></div></div></td>',
+                  '<td>',
+                    '<button class="layui-btn layui-btn-xs demo-reload layui-hide">重传</button>',
+                    '<button class="layui-btn layui-btn-xs layui-btn-danger demo-delete">删除</button>',
+                  '</td>',
+                '</tr>'].join(''));
+
+                // 单个重传
+                tr.find('.demo-reload').on('click', function(){
+                  obj.upload(index, file);
+                });
+
+                // 删除
+                tr.find('.demo-delete').on('click', function(){
+                  delete files[index]; // 删除对应的文件
+                  tr.remove(); // 删除表格行
+                  // 清空 input file 值，以免删除后出现同名文件不可选
+                  uploadListIns.config.elem.next()[0].value = '';
+                });
+
+                that.elemList.append(tr);
+                element.render('progress'); // 渲染新加的进度条组件
+              });
+            },
+            done: function(res, index, upload){ // 成功的回调
+              var that = this;
+              if (res.success) {
+                    element.progress('progress-demo', 100 + '%');
+                    layer.msg(res.msg, {icon: 1, time: 3000}, function () {
+                        delete this.files; // 删除文件队列已经上传成功的文件
+                        parent.layer.close(parent.layer.getFrameIndex(window.name));//关闭当前页
+                        window.parent.location.reload();
+                    });
+                } else {
+                    layer.msg(res.msg, {icon: 2});
+                }
+
+            },
+            allDone: function(obj){ // 多文件上传完毕后的状态回调
+                console.log(obj)
+            },
+            error: function(index, upload){ // 错误回调
+              var that = this;
+              var tr = that.elemList.find('tr#upload-'+ index);
+              var tds = tr.children();
+               // 显示重传
+              tds.eq(3).find('.demo-reload').removeClass('layui-hide');
+            },
+            progress: function(n, elem, e, index){ // 注意：index 参数为 layui 2.6.6 新增
+              element.progress('progress-demo', 50 + '%'); // 执行进度条。n 即为返回的进度百分比
+              var loadIndex = layer.msg('后台模型处理中, 请等待',
+                  {
+                    icon: 16,
+                    shade: 0.4,
+                    time: 1000*60*60 //一小时
+                  });
+              }
+        });
+    });
+</script>
+
+
+</body>
+</html>

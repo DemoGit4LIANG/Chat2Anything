@@ -1,0 +1,5 @@
+{
+  "plugin_name": "页面替换插件",
+  "plugin_version": "1.0.0.1",
+  "plugin_description": "在不更改原有框架视图函数的情况下更改渲染输出页面。"
+}

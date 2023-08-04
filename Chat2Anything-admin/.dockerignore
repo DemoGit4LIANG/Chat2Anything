@@ -1,0 +1,8 @@
+#build时候不会copy以下文件
+dockerdata
+docker-compose.yml
+Dockerfile.server
+README.md
+!dockerdata/config.py
+!dockerdata/start.sh
+!dockerdata/gunicorn.conf.py
