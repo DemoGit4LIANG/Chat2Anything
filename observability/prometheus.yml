@@ -1,0 +1,9 @@
+global:
+  scrape_interval: 15s
+
+scrape_configs:
+  - job_name: "chat2anything_migration_api"
+    static_configs:
+      - targets: ["migration_api:8100"]
+    metrics_path: /metrics
+

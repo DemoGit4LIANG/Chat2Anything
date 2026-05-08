@@ -1,0 +1,64 @@
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: chat2anything_pg
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: chat2anything
+    ports:
+      - "5432:5432"
+    volumes:
+      - chat2anything_pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d chat2anything"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  migration_api:
+    image: python:3.11-slim
+    container_name: chat2anything_migration_api
+    working_dir: /app
+    command: >
+      sh -c "pip install -r api/requirements-modern.txt &&
+             uvicorn app.main:app --app-dir /app/api --host 0.0.0.0 --port 8100"
+    env_file:
+      - api/.env
+    environment:
+      DATABASE_URL: postgresql+psycopg://postgres:postgres@postgres:5432/chat2anything
+    volumes:
+      - ./:/app
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "8100:8100"
+
+  prometheus:
+    image: prom/prometheus:v2.55.0
+    container_name: chat2anything_prometheus
+    volumes:
+      - ./observability/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    ports:
+      - "9090:9090"
+    depends_on:
+      - migration_api
+
+  grafana:
+    image: grafana/grafana:11.2.0
+    container_name: chat2anything_grafana
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin
+    volumes:
+      - ./observability/grafana/provisioning:/etc/grafana/provisioning
+    ports:
+      - "3000:3000"
+    depends_on:
+      - prometheus
+
+volumes:
+  chat2anything_pg_data:
+

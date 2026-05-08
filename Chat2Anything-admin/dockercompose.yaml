@@ -1,30 +1,37 @@
-version: '3'
+version: "3.9"
+name: chat2anything-migration
+
 services:
-  redis:
-    image: redis
-    container_name: redis
-    ports:
-      - "63799:6379"
-  mysql:
-    image: mysql
-    container_name: mysql
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: chat2anything_pg
+    restart: unless-stopped
     environment:
-      MYSQL_ROOT_PASSWORD: 123456
-      LANG: C.UTF-8
-      TZ: Asia/Shanghai  
-      MYSQL_CHARSET: utf8mb4
-      MYSQL_COLLATION: utf8mb4_unicode_ci
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: chat2anything
     ports:
-      - "3306:3306"
-  flask:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: flask
-    ports:
-      - "8000:8000"
+      - "5432:5432"
+    volumes:
+      - chat2anything_pg_data:/var/lib/postgresql/data
+
+  migration_api:
+    image: python:3.11-slim
+    container_name: chat2anything_migration_api
+    working_dir: /app
+    command: >
+      sh -c "pip install -r api/requirements-modern.txt &&
+             uvicorn app.main:app --app-dir /app/api --host 0.0.0.0 --port 8100"
+    env_file:
+      - ../api/.env
+    environment:
+      DATABASE_URL: postgresql+psycopg://postgres:postgres@postgres:5432/chat2anything
+    volumes:
+      - ../:/app
     depends_on:
-      - redis
-      - mysql
-    restart: always
-    command: sh -c  "./start.sh" 
+      - postgres
+    ports:
+      - "8100:8100"
+
+volumes:
+  chat2anything_pg_data:

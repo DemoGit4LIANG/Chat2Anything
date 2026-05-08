@@ -1,0 +1,35 @@
+{
+  "title": "Migration API Overview",
+  "uid": "migration-api-overview",
+  "timezone": "browser",
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "10s",
+  "panels": [
+    {
+      "id": 1,
+      "type": "timeseries",
+      "title": "API Requests Total",
+      "targets": [
+        {
+          "expr": "sum by (endpoint) (rate(chat2anything_api_requests_total[1m]))",
+          "refId": "A"
+        }
+      ],
+      "gridPos": { "h": 9, "w": 12, "x": 0, "y": 0 }
+    },
+    {
+      "id": 2,
+      "type": "timeseries",
+      "title": "GPU Usage Placeholder",
+      "targets": [
+        {
+          "expr": "chat2anything_gpu_usage_ratio",
+          "refId": "A"
+        }
+      ],
+      "gridPos": { "h": 9, "w": 12, "x": 12, "y": 0 }
+    }
+  ]
+}
+

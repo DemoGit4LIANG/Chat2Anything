@@ -1,0 +1,12 @@
+apiVersion: 1
+
+providers:
+  - name: migration-api
+    orgId: 1
+    folder: Migration
+    type: file
+    disableDeletion: false
+    editable: true
+    options:
+      path: /etc/grafana/provisioning/dashboards/json
+

@@ -926,6 +926,13 @@ def build_demo(models):
 
 
 if __name__ == "__main__":
+    if os.environ.get("CHAT2ANYTHING_ALLOW_LEGACY_WEB", "0") != "1":
+        raise SystemExit(
+            "Legacy FastChat web server is deprecated. "
+            "Use migration API instead: uvicorn app.main:app --app-dir api --port 8100. "
+            "Set CHAT2ANYTHING_ALLOW_LEGACY_WEB=1 only for temporary fallback."
+        )
+
     parser = argparse.ArgumentParser()
     parser.add_argument("--host", type=str, default="127.0.0.1")
     parser.add_argument("--port", type=int)

@@ -1,114 +1,51 @@
-# Chat2Anything
+# Chat2Anything（迁移版主线）
 
-| [**github**](https://github.com/DemoGit4LIANG/Chat2Anything)  |
+本仓库默认技术栈已切换为：
+- API：FastAPI（`/api/v1/*`）
+- 鉴权：JWT + RBAC
+- 数据：PostgreSQL + pgvector
+- 观测：Prometheus + Grafana（预置）
+- 部署：Docker Compose
 
+旧的 FastChat/Flask 运行链路保留为 legacy 参考，不再作为默认启动路径。
 
-Chat2Anything是面向企业内部环境的大模型(LLM)知识库问答系统，它具备以下功能：
+## 快速启动（推荐）
 
-- 包含客户端(Chat2Anything)与后台管理系统(Chat2Anything Admin)，其中后台管理系统负责大模型知识库的创建与管理，__用户可通过上传Excel、Word、PDF等文件向大模型添加企业内部知识__(Langchain机制)；管理系统包含完整的用户权限、角色、组织、数据字典管理等功能
-  
+### 方式一：Docker Compose
+1. 准备环境变量
+   - 复制 `api/.env.example` 为 `api/.env`
+2. 启动
+   - `docker compose -f docker-compose.migration.yml up -d`
+3. 访问
+   - API 文档：`http://127.0.0.1:8100/docs`
+   - Prometheus：`http://127.0.0.1:9090`
+   - Grafana：`http://127.0.0.1:3000`
 
-- 支持ChatGPT、ChatGLM、Vicuna等主流大模型，用户可随时切换大模型；__当使用ChatGLM、Vicuna时，整套系统可实现完全私域部署，企业数据100%内部流转__
+### 方式二：本地运行
+1. 进入 `api` 目录并创建虚拟环境
+2. 安装依赖：`python -m pip install -r requirements-modern.txt`
+3. 启动：`python -m uvicorn app.main:app --reload --port 8100`
 
+## 关键接口
+- `POST /api/v1/auth/login`
+- `GET /api/v1/auth/me`
+- `GET /api/v1/kb/list`
+- `POST /api/v1/kb/{id}/documents/upload`
+- `POST /api/v1/chat/ask`
+- `GET /api/v1/files/source/{doc_id}`
+- `GET /api/v1/audit/logs`
+- `GET /api/v1/usage/tokens/{daily|weekly|monthly}`
+- `GET /api/v1/settings/chat`
+- `PUT /api/v1/settings/chat`
 
-- 支持业务系统数据库接入，手动/自动选择查询分析涉及的表，__根据用户问题描述Text2SQL(待完善)，查询结果自动执行并可视化(待开发)__
+## 迁移资料
+- 模块映射：`docs/migration/module-mapping.md`
+- 回归清单：`docs/migration/regression-checklist.md`
+- 安全基线：`docs/migration/security-baseline.md`
 
-
-  <img src="Chat2Anything/assets/client_demo.gif" width="100%"/>
-  </br>
-  <img src="Chat2Anything/assets/admin_demo.gif" width="100%"/>
-
-## 部署
-### Chat2Anything (客户端)
-1. 本地配置ChatGLM (https://github.com/THUDM/ChatGLM-6B) / Vicuna (https://github.com/lm-sys/FastChat) 等大模型，如使用ChatGPT，在Chat2Anything/configs/openai_config.py文件中配置OPENAI_API_KEY和OPENAI_API_BASE
-
-2. 运行controller:
-    ```bash
-    python3 -m fastchat.serve.controller
-    ```
-
-3. 
-   运行model_worker (ChatGLM-6B, 推荐ChatGLM2-6B (https://github.com/THUDM/ChatGLM2-6B)):
-    ```bash
-    python3 -m fastchat.serve.model_worker_chatglm --model-path /path/to/model/weights
-    ```
-   or
-   
-   运行model_worker (vicuna):
-    ```bash
-    python3 -m fastchat.serve.model_worker --model-path /path/to/model/weights
-    ```
-   
-   
-4. 运行client web server
-    ```bash
-    python3 -m fastchat.serve.chat2anything_web_server
-    ```
-   如使用ChatGPT, 添加启动参数 --add-chatgpt
-
-
-5. 基本测试环境
-   
-    ```bash
-    Ubuntu 20.04 CUDA 11.7 Python 3.9 PyTorch 1.13
-    Tesla V100 32GB * 1
-    ```
-
-
-
-### Chat2Anything Admin (后台管理端)
-   1. 数据库(MySQL)配置:
-       ```python
-       # MySql配置信息
-         MYSQL_HOST=数据库地址
-         MYSQL_PORT=数据库端口
-         MYSQL_DATABASE=chat2anything_db
-         MYSQL_USERNAME=账户
-         MYSQL_PASSWORD=密码
-         
-      # 密钥配置
-         SECRET_KEY='一定要改'
-       ```
-      
-   2. 模型相关配置:
-       ```python
-       # model_config.py
-         embedding_model_dict = {
-         'text2vec": "/Path/to/text2vec-large-chinese',
-        }
-         
-      # 密钥配置
-         VECTOR_ROOT_PATH = os.path.join('/Path/to/Chat2Anything', 'vector_stores')
-       ```
-
-   3. 数据库初始化:
-      ```bash
-        flask db init
-        flask db migrate
-        flask db upgrade
-        flask admin init
-       ```
-      
-   4. 运行:
-      ```bash
-        # Windows
-        run.bat
-      
-        # Linux
-        chmod +x run.sh
-        ./run.sh
-      
-        # 管理员默写账户密码
-        admin 123456
-       ```
-      
-###  相关项目
-Appreciate the following contributions: 
-- [THUDM/chatglm-6b](https://huggingface.co/THUDM/chatglm-6b)
-- [lm-sys/FastChat](https://github.com/lm-sys/FastChat)
-- [THUDM/chatglm2-6b](https://github.com/THUDM/ChatGLM2-6B)
-- [chatchat-space/langchain-ChatGLM](https://github.com/chatchat-space/langchain-ChatGLM)
-- [Pear Admin Flask](https://gitee.com/pear-admin/pear-admin-flask)
+## Legacy 说明
+- `Chat2Anything/fastchat/*` 与 `Chat2Anything-admin/*` 作为历史实现保留。
+- 默认入口已切到迁移 API 主线；如需 legacy 调试，请在隔离分支中进行。
 
 
 
